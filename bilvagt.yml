@@ -1,0 +1,44 @@
+name: Bilvagten
+
+on:
+  schedule:
+    # Hver dag kl. 05:00 UTC = kl. 07:00 dansk sommertid / 06:00 vintertid
+    - cron: "0 5 * * *"
+  workflow_dispatch: {}   # giver en "Run workflow"-knap under Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bilvagten
+  cancel-in-progress: false
+
+jobs:
+  soeg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer
+        run: pip install requests beautifulsoup4
+
+      - name: Søg efter biler
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          PAGE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: python bilvagt.py
+
+      - name: Gem resultater
+        run: |
+          git config user.name "bilvagten"
+          git config user.email "bilvagten@users.noreply.github.com"
+          git add data docs
+          git diff --cached --quiet || git commit -m "Bilvagten $(date -u +%F)"
+          git push

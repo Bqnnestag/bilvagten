@@ -1,0 +1,8 @@
+[
+  {
+    "navn": "Porsche 944 Turbo / Turbo S",
+    "soeg": "porsche 944 turbo",
+    "skal_indeholde": ["944", "turbo"],
+    "udeluk": ["944 s2", "944 s ", "924", "968", "dele", "parts", "teile", "fælge", "wheels", "model 1:", "modelbil"]
+  }
+]
